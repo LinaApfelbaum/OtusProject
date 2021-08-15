@@ -132,3 +132,9 @@ dmypy.json
 
 # Allure-results dir
 /allure-results
+
+# logs
+/logs
+
+# last session file
+/debug_session

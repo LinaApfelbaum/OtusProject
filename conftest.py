@@ -2,10 +2,18 @@ import logging
 import allure
 import pytest
 from selenium import webdriver
+import os.path
 from selenium.webdriver.opera.options import Options
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
 
 from browser_log_listener import BrowserLogListener
+from page_objects.home_page import HomePage
+from page_objects.inbox_page import InboxPage
+from page_objects.settings_folders_page import SettingsFoldersPage
+from page_objects.settings_general_page import SettingsGeneralPage
+from page_objects.settings_page import SettingsPage
+from utils.mail import Mail
+from utils.user import User
 
 
 def pytest_addoption(parser):
@@ -21,6 +29,16 @@ def pytest_addoption(parser):
     parser.addoption("--browser_version", action="store", default="91.0")
     parser.addoption("--vnc", action="store_true", default=False)
     parser.addoption("--logs", action="store_true", default=False)
+    parser.addoption("--debug_session", action="store_true", default=False)
+    parser.addoption("--login", default="otus_test@bk.ru")
+    parser.addoption("--password", default="4bTjZHp447jdtSL2")
+
+    parser.addoption("--pop_server", default="pop.mail.ru")
+    parser.addoption("--receiver_password", default="11ZWgYdTcdopJDofR4oq")
+    parser.addoption("--smtp_server", default="smtp.mail.ru")
+    parser.addoption("--smtp_port", default="465")
+    parser.addoption("--sender_email", default="otus_test_sender@bk.ru")
+    parser.addoption("--sender_password", default="QRb7eBmZ8lmyMfJCfEmT")
 
 
 @pytest.fixture()
@@ -30,11 +48,20 @@ def browser(request):
     version = request.config.getoption("--browser_version")
     vnc = request.config.getoption("--vnc")
     logs = request.config.getoption("--logs")
+    debug_session = request.config.getoption("--debug_session")
 
     logger = logging.getLogger('BrowserLogger')
     log_file_handler = logging.FileHandler('logs/browser.log')
     logger.addHandler(log_file_handler)
     logger.setLevel(logging.INFO)
+
+    if debug_session and os.path.isfile('debug_session'):
+        with open('debug_session') as file:
+            debug_data = file.readline().split(' ')
+        driver = webdriver.Remote(command_executor=debug_data[1])
+        driver.close()
+        driver.session_id = debug_data[0]
+        return driver
 
     if executor == "local":
         driver = create_local_driver(request)
@@ -42,7 +69,7 @@ def browser(request):
         caps = {
             "browserName": browser_name,
             "browserVersion": version,
-            # "screenResolution": "1280x720",
+            "screenResolution": "1366x768",
             "name": "Duck",
             "selenoid:options": {
                 "enableVNC": vnc,
@@ -59,7 +86,8 @@ def browser(request):
             desired_capabilities=caps
         )
 
-    driver = EventFiringWebDriver(driver, BrowserLogListener(logger))
+    # ToDo:
+    # driver = EventFiringWebDriver(driver, BrowserLogListener(logger))
 
     return driver
 
@@ -68,10 +96,12 @@ def create_local_driver(request):
     drivers_path = request.config.getoption("--drivers_path")
     headless = request.config.getoption("--headless")
     browser = request.config.getoption("--browser")
+    debug_session = request.config.getoption("--debug_session")
 
     if browser == "chrome":
         options = webdriver.ChromeOptions()
         options.headless = headless
+        options.add_argument("--start-maximized")
         driver = webdriver.Chrome(
             executable_path=drivers_path + "/chromedriver", options=options)
 
@@ -90,7 +120,11 @@ def create_local_driver(request):
     else:
         raise ValueError("Browser is not supported")
 
-    request.addfinalizer(driver.quit)
+    if debug_session:
+        with open('debug_session', 'w') as file:
+            file.write('{} {}'.format(driver.session_id, driver.command_executor._url))
+    else:
+        request.addfinalizer(driver.quit)
 
     return driver
 
@@ -116,3 +150,55 @@ def test_failed_check(browser, request):
             name='Screenshot',
             attachment_type=allure.attachment_type.PNG
         )
+
+@pytest.fixture()
+def logged_in_user(credentials, home_page):
+    home_page.open()
+    home_page.login(credentials)
+
+@pytest.fixture()
+def user(home_page, credentials):
+    return User(home_page, credentials)
+
+@pytest.fixture()
+def mail(request):
+    return Mail(
+        request.config.getoption("--pop_server"),
+        request.config.getoption("--login"),
+        request.config.getoption("--receiver_password"),
+        request.config.getoption("--smtp_server"),
+        int(request.config.getoption("--smtp_port")),
+        request.config.getoption("--sender_email"),
+        request.config.getoption("--sender_password"))
+
+@pytest.fixture()
+def base_url():
+    return "https://mail.ru"
+
+@pytest.fixture()
+def inbox_base_url():
+    return "https://e.mail.ru/inbox/"
+
+@pytest.fixture()
+def credentials(request):
+    return (request.config.getoption("--login"), request.config.getoption("--password"))
+
+@pytest.fixture()
+def home_page(browser, base_url):
+    return HomePage(browser, base_url)
+
+@pytest.fixture()
+def inbox_page(browser, inbox_base_url):
+    return InboxPage(browser, inbox_base_url)
+
+@pytest.fixture()
+def settings_page(browser):
+    return SettingsPage(browser)
+
+@pytest.fixture()
+def settings_general_page(browser):
+    return SettingsGeneralPage(browser)
+
+@pytest.fixture()
+def settings_folders_page(browser):
+    return SettingsFoldersPage(browser)
