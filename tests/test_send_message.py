@@ -1,4 +1,8 @@
+import allure
 
+
+@allure.title("Compose and send message")
+@allure.description("Test checks that user is able to compose and send message")
 def test_send_message(user, mail, inbox_page):
     recipient_email = mail.get_sender_email()
     subject = "test_subject"
