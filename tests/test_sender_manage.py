@@ -1,4 +1,8 @@
+import allure
 
+
+@allure.title("Manage senders in the Settings")
+@allure.description("Test checks senders are being created and deleted")
 def test_sender_manage(user, inbox_page, settings_page, settings_general_page):
     sender_name = "test_name"
     sender_signature = "test_signature"
