@@ -1,5 +1,8 @@
+import allure
 
 
+@allure.title("Archive message in the Inbox")
+@allure.description("Test checks that message is being archived")
 def test_archive_message(mail, user, inbox_page):
     subject = "Archive me"
     mail.remove_inbox_message(subject)
