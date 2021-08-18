@@ -14,4 +14,5 @@ def test_sender_manage(user, inbox_page, settings_page, settings_general_page):
     settings_general_page.delete_sender(sender_name)
 
     senders = settings_general_page.get_all_senders()
+    settings_general_page.close_tab()
     assert sender_name not in senders

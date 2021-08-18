@@ -132,6 +132,7 @@ dmypy.json
 
 # Allure-results dir
 /allure-results
+/allure-report
 
 # logs
 /logs

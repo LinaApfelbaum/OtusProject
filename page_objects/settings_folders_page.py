@@ -49,6 +49,10 @@ class SettingsFoldersPage:
                     self.browser, self.CONFIRMATION_DELETE_BUTTON).click()
         time.sleep(1)
 
+    def close_tab(self):
+        self.browser.close()
+        self.browser.switch_to.window(self.browser.window_handles[0])
+
     def _find_folder_elements(self):
         get_element(self.browser, (By.CSS_SELECTOR, self.ALL_FOLDERS))
         return self.browser.find_elements_by_css_selector(self.ALL_FOLDERS)

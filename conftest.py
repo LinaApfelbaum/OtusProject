@@ -24,6 +24,7 @@ def pytest_addoption(parser):
         "--browser", action="store", default="chrome", help="Select browser from chrome, firefox, opera"
     )
     parser.addoption("--headless", action="store_true", help="Run headless")
+    parser.addoption("--disable_images", action="store_true", help="Disable images loading")
     parser.addoption("--executor", action="store",
                      default="127.0.0.1:4444", help="Use 'local' to run tests locally")
     parser.addoption("--browser_version", action="store", default="91.0")
@@ -41,7 +42,7 @@ def pytest_addoption(parser):
     parser.addoption("--sender_password", default="QRb7eBmZ8lmyMfJCfEmT")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def browser(request):
     browser_name = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
@@ -95,6 +96,7 @@ def browser(request):
 def create_local_driver(request):
     drivers_path = request.config.getoption("--drivers_path")
     headless = request.config.getoption("--headless")
+    disable_images = request.config.getoption("--disable_images")
     browser = request.config.getoption("--browser")
     debug_session = request.config.getoption("--debug_session")
 
@@ -102,6 +104,11 @@ def create_local_driver(request):
         options = webdriver.ChromeOptions()
         options.headless = headless
         options.add_argument("--start-maximized")
+
+        if disable_images:
+            prefs = {"profile.managed_default_content_settings.images": 2}
+            options.add_experimental_option("prefs", prefs)
+
         driver = webdriver.Chrome(
             executable_path=drivers_path + "/chromedriver", options=options)
 
@@ -151,14 +158,10 @@ def test_failed_check(browser, request):
             attachment_type=allure.attachment_type.PNG
         )
 
-@pytest.fixture()
-def logged_in_user(credentials, home_page):
-    home_page.open()
-    home_page.login(credentials)
 
 @pytest.fixture()
-def user(home_page, credentials):
-    return User(home_page, credentials)
+def user(home_page, credentials, inbox_page):
+    return User(home_page, credentials, inbox_page)
 
 @pytest.fixture()
 def mail(request):

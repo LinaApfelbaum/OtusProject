@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
@@ -32,3 +33,10 @@ class HomePage:
         get_element(self.browser, self.PASSWORD_FIELD).send_keys(
             credentials[1])
         get_element(self.browser, self.LOGIN_BUTTON).click()
+
+    def is_logged_in(self):
+        try:
+            self.browser.find_element_by_css_selector(self.INPUT_PASSWORD_BUTTON[1])
+            return False
+        except NoSuchElementException:
+            return True

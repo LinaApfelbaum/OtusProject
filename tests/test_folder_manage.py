@@ -13,4 +13,5 @@ def test_folder_manage(user, inbox_page, settings_page, settings_folders_page):
     settings_folders_page.delete_folder(folder_name)
 
     folders = settings_folders_page.get_all_folders()
+    settings_folders_page.close_tab()
     assert folder_name not in folders
