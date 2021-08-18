@@ -1,5 +1,8 @@
+import allure
 
 
+@allure.title("Empty full Trash folder")
+@allure.description("Test checks that full Trash folder is being emptied")
 def test_empty_trash(mail, user, inbox_page):
     subject = "Move me to Trash"
     mail.remove_inbox_message(subject)
