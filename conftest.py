@@ -4,9 +4,6 @@ import pytest
 from selenium import webdriver
 import os.path
 from selenium.webdriver.opera.options import Options
-from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
-
-from browser_log_listener import BrowserLogListener
 from page_objects.home_page import HomePage
 from page_objects.inbox_page import InboxPage
 from page_objects.settings_folders_page import SettingsFoldersPage
@@ -32,14 +29,14 @@ def pytest_addoption(parser):
     parser.addoption("--logs", action="store_true", default=False)
     parser.addoption("--debug_session", action="store_true", default=False)
     parser.addoption("--login", default="otus_test@bk.ru")
-    parser.addoption("--password", default="4bTjZHp447jdtSL2")
+    parser.addoption("--password")
 
     parser.addoption("--pop_server", default="pop.mail.ru")
-    parser.addoption("--receiver_password", default="11ZWgYdTcdopJDofR4oq")
+    parser.addoption("--app_password")
     parser.addoption("--smtp_server", default="smtp.mail.ru")
     parser.addoption("--smtp_port", default="465")
     parser.addoption("--sender_email", default="otus_test_sender@bk.ru")
-    parser.addoption("--sender_password", default="QRb7eBmZ8lmyMfJCfEmT")
+    parser.addoption("--sender_app_password")
 
 
 @pytest.fixture(scope="session")
@@ -90,8 +87,6 @@ def browser(request):
         )
 
         driver.set_window_size(width, height)
-    # ToDo:
-    # driver = EventFiringWebDriver(driver, BrowserLogListener(logger))
 
     return driver
 
@@ -171,11 +166,11 @@ def mail(request):
     return Mail(
         request.config.getoption("--pop_server"),
         request.config.getoption("--login"),
-        request.config.getoption("--receiver_password"),
+        request.config.getoption("--app_password"),
         request.config.getoption("--smtp_server"),
         int(request.config.getoption("--smtp_port")),
         request.config.getoption("--sender_email"),
-        request.config.getoption("--sender_password"))
+        request.config.getoption("--sender_app_password"))
 
 @pytest.fixture()
 def base_url():
