@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+/.idea
+
+# Allure-results dir
+/allure-results
+/allure-report
+
+# logs
+/logs
+
+# last session file
+/debug_session
