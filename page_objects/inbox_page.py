@@ -1,5 +1,3 @@
-import time
-
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
@@ -8,7 +6,8 @@ from framework import get_element
 
 
 class InboxPage:
-    USER_PANEL_EMAIL = (By.CSS_SELECTOR, ".ph-project__account")
+    USER_PANEL = (By.CSS_SELECTOR, ".ph-project__account")
+    USER_PANEL_EMAIL = (By.CSS_SELECTOR, ".ph-project__user-name")
     EXIT_LINK = (By.CSS_SELECTOR, ".ph-sidebar a[href*='logout']")
 
     COMPOSE_MESSAGE_BUTTON = (By.CSS_SELECTOR, ".sidebar [title='Compose']")
@@ -67,7 +66,7 @@ class InboxPage:
         return get_element(self.browser, self.USER_PANEL_EMAIL).text.strip()
 
     def logout(self):
-        get_element(self.browser, self.USER_PANEL_EMAIL).click()
+        get_element(self.browser, self.USER_PANEL).click()
         get_element(self.browser, self.EXIT_LINK).click()
 
     def open_all_settings(self):
