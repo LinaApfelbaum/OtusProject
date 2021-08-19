@@ -4,7 +4,8 @@ import ssl
 
 
 class Mail:
-    def __init__(self, pop_server, receiver_email, receiver_password, smtp_server, smtp_port, sender_email, sender_password):
+    def __init__(self, pop_server, receiver_email, receiver_password,
+                 smtp_server, smtp_port, sender_email, sender_password):
         self.sender_password = sender_password
         self.sender_email = sender_email
         self.smtp_port = smtp_port
@@ -20,9 +21,9 @@ class Mail:
         mail_server = poplib.POP3_SSL(self.pop_address)
         mail_server.user(self.receiver_email)
         mail_server.pass_(self.receiver_password)
-        numMessages = len(mail_server.list()[1])
+        num_messages = len(mail_server.list()[1])
 
-        for i in range(numMessages):
+        for i in range(num_messages):
             letter = mail_server.retr(i + 1)[1]
             for line in letter:
                 if line.decode('utf-8') == 'Subject: {}'.format(subject):

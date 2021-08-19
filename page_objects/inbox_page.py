@@ -2,7 +2,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
 
-from framework import get_element
+from framework.framework import get_element
 
 
 class InboxPage:

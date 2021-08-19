@@ -2,7 +2,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
-from framework import get_element
+from framework.framework import get_element
 
 
 class HomePage:
@@ -36,7 +36,8 @@ class HomePage:
 
     def is_logged_in(self):
         try:
-            self.browser.find_element_by_css_selector(self.INPUT_PASSWORD_BUTTON[1])
+            self.browser.find_element_by_css_selector(
+                self.INPUT_PASSWORD_BUTTON[1])
             return False
         except NoSuchElementException:
             return True
