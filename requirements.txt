@@ -13,3 +13,4 @@ toml==0.10.2
 urllib3==1.26.6
 autopep8==1.5.7
 pylint==2.9.6
+pytest-xdist==2.3.0
