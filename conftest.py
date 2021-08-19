@@ -67,10 +67,12 @@ def browser(request):
     if executor == "local":
         driver = create_local_driver(request)
     else:
+        width = 1366
+        height = 768
         caps = {
             "browserName": browser_name,
             "browserVersion": version,
-            "screenResolution": "1366x768",
+            "screenResolution": f"{width}x{height}x24",
             "name": "Duck",
             "selenoid:options": {
                 "enableVNC": vnc,
@@ -87,6 +89,7 @@ def browser(request):
             desired_capabilities=caps
         )
 
+        driver.set_window_size(width, height)
     # ToDo:
     # driver = EventFiringWebDriver(driver, BrowserLogListener(logger))
 
